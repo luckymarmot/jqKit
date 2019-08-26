@@ -10,6 +10,10 @@
 		AE2F00A3231441D000DEA996 /* jqKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F0099231441D000DEA996 /* jqKit.framework */; };
 		AE2F00A8231441D000DEA996 /* jqKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AE2F00A7231441D000DEA996 /* jqKitTests.m */; };
 		AE2F00AA231441D000DEA996 /* jqKit.h in Headers */ = {isa = PBXBuildFile; fileRef = AE2F009C231441D000DEA996 /* jqKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = AE2F00B32314480800DEA996 /* LMJqFilter.h */; };
+		AE2F00B62314480800DEA996 /* LMJqFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = AE2F00B42314480800DEA996 /* LMJqFilter.m */; };
+		AE2F00BE231448A600DEA996 /* libjq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BC231448A600DEA996 /* libjq.a */; };
+		AE2F00BF231448A600DEA996 /* libonig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BD231448A600DEA996 /* libonig.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +33,10 @@
 		AE2F00A2231441D000DEA996 /* jqKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jqKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE2F00A7231441D000DEA996 /* jqKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = jqKitTests.m; sourceTree = "<group>"; };
 		AE2F00A9231441D000DEA996 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AE2F00B32314480800DEA996 /* LMJqFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMJqFilter.h; sourceTree = "<group>"; };
+		AE2F00B42314480800DEA996 /* LMJqFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LMJqFilter.m; sourceTree = "<group>"; };
+		AE2F00BC231448A600DEA996 /* libjq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjq.a; path = Dependencies/jq_install/lib/libjq.a; sourceTree = SOURCE_ROOT; };
+		AE2F00BD231448A600DEA996 /* libonig.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonig.a; path = Dependencies/onig_install/lib/libonig.a; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +44,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE2F00BF231448A600DEA996 /* libonig.a in Frameworks */,
+				AE2F00BE231448A600DEA996 /* libjq.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				AE2F009B231441D000DEA996 /* jqKit */,
+				AE2F00BB2314487F00DEA996 /* Libraries */,
 				AE2F00A6231441D000DEA996 /* jqKitTests */,
 				AE2F009A231441D000DEA996 /* Products */,
 			);
@@ -73,6 +84,8 @@
 			children = (
 				AE2F009C231441D000DEA996 /* jqKit.h */,
 				AE2F009D231441D000DEA996 /* Info.plist */,
+				AE2F00B32314480800DEA996 /* LMJqFilter.h */,
+				AE2F00B42314480800DEA996 /* LMJqFilter.m */,
 			);
 			path = jqKit;
 			sourceTree = "<group>";
@@ -86,6 +99,15 @@
 			path = jqKitTests;
 			sourceTree = "<group>";
 		};
+		AE2F00BB2314487F00DEA996 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				AE2F00BC231448A600DEA996 /* libjq.a */,
+				AE2F00BD231448A600DEA996 /* libonig.a */,
+			);
+			path = Libraries;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -93,6 +115,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */,
 				AE2F00AA231441D000DEA996 /* jqKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -193,6 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE2F00B62314480800DEA996 /* LMJqFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +291,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/Dependencies/jq_install/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -323,6 +348,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/Dependencies/jq_install/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -350,6 +376,11 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Dependencies/jq_install/lib",
+					"$(PROJECT_DIR)/Dependencies/onig_install/lib",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.luckymarmot.jqKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -373,6 +404,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Dependencies/jq_install/lib",
+					"$(PROJECT_DIR)/Dependencies/onig_install/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.luckymarmot.jqKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
