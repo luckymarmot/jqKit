@@ -8,30 +8,64 @@
 
 #import <XCTest/XCTest.h>
 
+#import "LMJqFilter.h"
+
 @interface jqKitTests : XCTestCase
 
 @end
 
 @implementation jqKitTests
 
-- (void)setUp {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+- (void)testSimpleSelf
+{
+    // {"foo": 0, "bar":1}
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(results, (@[[@"{\n  \"foo\": 0,\n  \"bar\": 42\n}" dataUsingEncoding:NSASCIIStringEncoding]]));
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+- (void)testSimpleOneKey
+{
+    // {"foo": 0, "bar":1}
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".bar" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(results, (@[[@"42" dataUsingEncoding:NSASCIIStringEncoding]]));
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+- (void)testSimpleAllValues
+{
+    // {"foo": 0, "bar":1}
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[]" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(results, (@[[@"0" dataUsingEncoding:NSASCIIStringEncoding], [@"42" dataUsingEncoding:NSASCIIStringEncoding]]));
 }
 
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
+- (void)testErrorInvalidProgram
+{
+    // {"foo": 0, "bar":1}
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"(." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNil(results);
+    XCTAssertNotNil(error);
+    XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
+    XCTAssertEqual(error.code, LMJqFilterCompileError);
+}
+
+- (void)testErrorInvalidJSON
+{
+    // {"foo": 0, "bar":1}
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, XXXXX}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNil(results);
+    XCTAssertNotNil(error);
+    XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
+    XCTAssertEqual(error.code, LMJqFilterParsingError);
 }
 
 @end
