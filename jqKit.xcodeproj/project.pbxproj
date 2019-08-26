@@ -10,7 +10,7 @@
 		AE2F00A3231441D000DEA996 /* jqKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F0099231441D000DEA996 /* jqKit.framework */; };
 		AE2F00A8231441D000DEA996 /* jqKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AE2F00A7231441D000DEA996 /* jqKitTests.m */; };
 		AE2F00AA231441D000DEA996 /* jqKit.h in Headers */ = {isa = PBXBuildFile; fileRef = AE2F009C231441D000DEA996 /* jqKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = AE2F00B32314480800DEA996 /* LMJqFilter.h */; };
+		AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = AE2F00B32314480800DEA996 /* LMJqFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AE2F00B62314480800DEA996 /* LMJqFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = AE2F00B42314480800DEA996 /* LMJqFilter.m */; };
 		AE2F00BE231448A600DEA996 /* libjq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BC231448A600DEA996 /* libjq.a */; };
 		AE2F00BF231448A600DEA996 /* libonig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BD231448A600DEA996 /* libonig.a */; };
@@ -115,8 +115,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */,
 				AE2F00AA231441D000DEA996 /* jqKit.h in Headers */,
+				AE2F00B52314480800DEA996 /* LMJqFilter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
