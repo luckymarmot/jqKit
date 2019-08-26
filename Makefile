@@ -16,3 +16,7 @@ libjq:
 		./configure CFLAGS=-fPIC --disable-maintainer-mode --enable-all-static --disable-shared --with-oniguruma="$(DIR)/Dependencies/onig_install" --disable-docs --prefix="$(DIR)/Dependencies/jq_install" && \
 		make && \
 		make install-libLTLIBRARIES install-includeHEADERS
+
+clean:
+	make -C ./Dependencies/jq/ clean
+	make -C ./Dependencies/jq/modules/oniguruma/ clean

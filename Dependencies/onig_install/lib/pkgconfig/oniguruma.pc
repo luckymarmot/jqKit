@@ -1,0 +1,14 @@
+prefix=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install
+exec_prefix=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install
+libdir=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install/lib
+includedir=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install/include
+datarootdir=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install/share
+datadir=/Users/michamazaheri/paw/jqKit/Dependencies/onig_install/share
+
+Name: oniguruma
+Description: Regular expression library
+Version: 6.1.3
+Requires:
+Libs: -L${libdir} -lonig
+Cflags: -I${includedir}
+
