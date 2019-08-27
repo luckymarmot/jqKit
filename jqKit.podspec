@@ -35,7 +35,7 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/luckymarmot'
 
   s.platform = :osx
-  s.osx.deployment_target = "10.14"
+  s.osx.deployment_target = "10.10"
 
   s.source_files = 'jqKit/*.{m,h}', 'Dependencies/jq_install/include/*.h'
   s.public_header_files = 'jqKit/*.h', 'Dependencies/jq_install/include/*.h'
