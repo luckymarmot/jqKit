@@ -1,5 +1,5 @@
 #
-# Be sure to run `pod lib lint jqKit.podspec' to ensure this is a
+# Be sure to run `pod lib lint macOSjqKit.podspec' to ensure this is a
 # valid spec before submitting.
 #
 # Any lines starting with a # are optional, but their use is encouraged
@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'jqKit'
+  s.name             = 'macOSjqKit'
   s.version          = '1.0.0'
   s.summary          = 'An Objective-C wrapper around jqlib.'
 
@@ -42,5 +42,5 @@ Pod::Spec.new do |s|
   s.header_dir = 'Dependencies/jq_install/include'
   s.preserve_paths = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
   s.vendored_libraries = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
-  s.module_name = 'jqKit'
+  s.module_name = 'macOSjqKit'
 end
