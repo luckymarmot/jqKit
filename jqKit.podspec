@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'jqKit'
-  s.version          = '0.1.0'
+  s.version          = '1.0.0'
   s.summary          = 'An Objective-C wrapper around jqlib.'
 
 # This description is used to generate tags and improve search results.
@@ -42,4 +42,5 @@ Pod::Spec.new do |s|
   s.header_dir = 'Dependencies/jq_install/include'
   s.preserve_paths = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
   s.vendored_libraries = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
+  s.module_name = 'jqKit'
 end
