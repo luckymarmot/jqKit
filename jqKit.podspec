@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'jqKit'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of jqKit.'
+  s.summary          = 'An Objective-C wrapper around jqlib.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,26 +18,28 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+  An Objective-C wrapper around jqlib, the C library that powers the jq JSON filtering tool.
+  See: https://stedolan.github.io/jq/
                        DESC
 
   s.homepage         = 'https://github.com/luckymarmot/jqKit'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Paw' => 'info@paw.cloud' }
+  s.author           = {
+    'Stephen Dolan' => 'mu@netsoc.tcd.ie',
+    'Nicolas Williams' => 'nico@cryptonector.com',
+    'William Langford' => 'wlangfor@gmail.com',
+    'Micha Mazaheri' => 'micha@paw.cloud'
+  }
   s.source           = { :git => 'https://github.com/luckymarmot/jqKit.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/luckymarmot'
 
   s.platform = :osx
-  s.osx.deployment_target = "10.10"
+  s.osx.deployment_target = "10.14"
 
-  s.source_files = 'jqKit/Classes/**/*'
-
-  # s.resource_bundles = {
-  #   'jqKit' => ['jqKit/Assets/*.png']
-  # }
-
-  s.public_header_files = 'jqKit/*.h'
-  # s.frameworks = 'Cocoa'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.source_files = 'jqKit/*.{m,h}', 'Dependencies/jq_install/include/*.h'
+  s.public_header_files = 'jqKit/*.h', 'Dependencies/jq_install/include/*.h'
+  s.header_dir = 'Dependencies/jq_install/include'
+  s.preserve_paths = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
+  s.vendored_libraries = 'Dependencies/onig_install/lib/libonig.a', 'Dependencies/jq_install/lib/libjq.a'
 end
