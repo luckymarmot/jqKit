@@ -77,6 +77,35 @@
     XCTAssertEqual(error.code, LMJqFilterParsingError);
 }
 
+#pragma mark - Callback
+
+- (void)testCallback
+{
+    NSError* error = nil;
+    NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] callback:^(NSData * output, BOOL * __stop) {
+        [resultArray addObject:output];
+    } error:&error];
+    XCTAssertEqual(result, LMJqFilterSuccess);
+    XCTAssertNotNil(resultArray);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(resultArray, (@[[@"10" dataUsingEncoding:NSASCIIStringEncoding], [@"20" dataUsingEncoding:NSASCIIStringEncoding], [@"30" dataUsingEncoding:NSASCIIStringEncoding], [@"40" dataUsingEncoding:NSASCIIStringEncoding]]));
+}
+
+- (void)testCallbackStop
+{
+    NSError* error = nil;
+    NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] callback:^(NSData * output, BOOL * __stop) {
+        [resultArray addObject:output];
+        *__stop = YES;
+    } error:&error];
+    XCTAssertEqual(result, LMJqFilterSuccess);
+    XCTAssertNotNil(resultArray);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(resultArray, (@[[@"10" dataUsingEncoding:NSASCIIStringEncoding]]));
+}
+
 #pragma mark - Large Tests
 
 - (void)testSmallSelf

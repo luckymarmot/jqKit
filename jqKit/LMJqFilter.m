@@ -21,9 +21,10 @@ enum {
     JQ_ERROR_UNKNOWN   =  5,
 };
 
-static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (^callback)(bool, const char* output, const char* error)) {
+static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (^callback)(bool, const char* output, const char* error, bool* __stop)) {
     int ret = JQ_OK_NO_OUTPUT;
     jv result;
+    bool stop = false;
 
     // start and loop over results
     jq_start(jq, value, flags);
@@ -40,48 +41,57 @@ static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (
         const char* output = jv_string_value(string_dump);
 
         // callback
-        callback(true, output, NULL);
+        callback(true, output, NULL, &stop);
+
+        // stop?
+        if (stop) {
+            break;
+        }
     }
 
-    // jq program invoked `halt` or `halt_error`
-    if (jq_halted(jq)) {
-        // get exit code
-        jv exit_code = jq_get_exit_code(jq);
-        if (!jv_is_valid(exit_code)) {
-            ret = JQ_OK;
+    // do not run checks if stopped
+    if (!stop) {
+        // jq program invoked `halt` or `halt_error`
+        if (jq_halted(jq)) {
+            // get exit code
+            jv exit_code = jq_get_exit_code(jq);
+            if (!jv_is_valid(exit_code)) {
+                ret = JQ_OK;
+            }
+            else if (jv_get_kind(exit_code) == JV_KIND_NUMBER) {
+                ret = jv_number_value(exit_code);
+            }
+            else {
+                ret = JQ_ERROR_UNKNOWN;
+            }
+            jv_free(exit_code);
+            
+            // get error message
+            jv error_message = jq_get_error_message(jq);
+            if (jv_get_kind(error_message) == JV_KIND_STRING) {
+                callback(false, NULL, jv_string_value(error_message), &stop);
+            } else if (jv_get_kind(error_message) == JV_KIND_NULL) {
+                // halt with no output
+            } else if (jv_is_valid(error_message)) {
+                error_message = jv_dump_string(jv_copy(error_message), 0);
+                callback(false, NULL, jv_string_value(error_message), &stop);
+            };
+            jv_free(error_message);
         }
-        else if (jv_get_kind(exit_code) == JV_KIND_NUMBER) {
-            ret = jv_number_value(exit_code);
-        }
-        else {
+        // uncaught jq exception
+        else if (jv_invalid_has_msg(jv_copy(result))) {
+            jv msg = jv_invalid_get_msg(jv_copy(result));
+            if (jv_get_kind(msg) == JV_KIND_STRING) {
+                callback(false, NULL, jv_string_value(msg), &stop);
+            } else {
+                msg = jv_dump_string(msg, 0);
+                callback(false, NULL, jv_string_value(msg), &stop);
+            }
             ret = JQ_ERROR_UNKNOWN;
+            jv_free(msg);
         }
-        jv_free(exit_code);
+    }
 
-        // get error message
-        jv error_message = jq_get_error_message(jq);
-        if (jv_get_kind(error_message) == JV_KIND_STRING) {
-            callback(false, NULL, jv_string_value(error_message));
-        } else if (jv_get_kind(error_message) == JV_KIND_NULL) {
-            // halt with no output
-        } else if (jv_is_valid(error_message)) {
-            error_message = jv_dump_string(jv_copy(error_message), 0);
-            callback(false, NULL, jv_string_value(error_message));
-        };
-        jv_free(error_message);
-    }
-    // uncaught jq exception
-    else if (jv_invalid_has_msg(jv_copy(result))) {
-        jv msg = jv_invalid_get_msg(jv_copy(result));
-        if (jv_get_kind(msg) == JV_KIND_STRING) {
-            callback(false, NULL, jv_string_value(msg));
-        } else {
-            msg = jv_dump_string(msg, 0);
-            callback(false, NULL, jv_string_value(msg));
-        }
-        ret = JQ_ERROR_UNKNOWN;
-        jv_free(msg);
-    }
     jv_free(result);
     return ret;
 }
@@ -92,7 +102,7 @@ static void lm_jq_err_cb(void *data, jv msg) {
     //    jv_free(msg);
 }
 
-LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^callback)(bool, const char* output, const char* error))
+LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^callback)(bool, const char* output, const char* error, bool* __stop))
 {
     // init jq
     jq_state* jq = jq_init();
@@ -124,7 +134,7 @@ NSString* LMJqFilterErrorJQString = @"JQString";
 
 @implementation LMJqFilter
 
-+ (BOOL)filterWithProgram:(NSString*)program data:(NSData*)data callback:(void(^)(NSData*))callback error:(NSError**)__error
++ (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data callback:(void(^)(NSData*, BOOL* __stop))callback error:(NSError**)__error
 {
     // get program C string
     const char* programStr = [program cStringUsingEncoding:NSUTF8StringEncoding];
@@ -137,11 +147,15 @@ NSString* LMJqFilterErrorJQString = @"JQString";
 
     // run filter
     __block NSError* error = nil;
-    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, ^(bool status, const char *outputStr, const char *errorStr) {
+    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, ^(bool status, const char *outputStr, const char *errorStr, bool* __stop) {
         if (status) {
             NSUInteger outputLen = strlen(outputStr);
             NSData* output = [NSData dataWithBytes:outputStr length:outputLen];
-            callback(output);
+            BOOL stop = NO;
+            callback(output, &stop);
+            if (stop) {
+                *__stop = true;
+            }
         }
         else {
             NSString* errorJq = (errorStr != NULL ? [NSString stringWithCString:errorStr encoding:NSUTF8StringEncoding] : nil);
@@ -168,7 +182,7 @@ NSString* LMJqFilterErrorJQString = @"JQString";
 {
     NSError* error;
     NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
-    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data callback:^(NSData* output) {
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data callback:^(NSData* output, BOOL* __stop) {
         [resultArray addObject:output];
     } error:&error];
 
