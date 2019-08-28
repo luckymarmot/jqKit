@@ -106,6 +106,26 @@
     XCTAssertEqualObjects(resultArray, (@[[@"10" dataUsingEncoding:NSASCIIStringEncoding]]));
 }
 
+#pragma mark - First Result
+
+- (void)testFirstResultDict
+{
+    NSError* error = nil;
+    NSData* firstResult = [LMJqFilter firstResultWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNotNil(firstResult);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(firstResult, ([@"{\n  \"foo\": 0,\n  \"bar\": 42\n}" dataUsingEncoding:NSASCIIStringEncoding]));
+}
+
+- (void)testFirstResultArray
+{
+    NSError* error = nil;
+    NSData* firstResult = [LMJqFilter firstResultWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNotNil(firstResult);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(firstResult, ([@"10" dataUsingEncoding:NSASCIIStringEncoding]));
+}
+
 #pragma mark - Large Tests
 
 - (void)testSmallSelf

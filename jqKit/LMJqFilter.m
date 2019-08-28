@@ -92,7 +92,6 @@ static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (
         }
     }
 
-    jv_free(result);
     return ret;
 }
 
@@ -195,6 +194,26 @@ NSString* LMJqFilterErrorJQString = @"JQString";
     }
 
     return [resultArray copy];
+}
+
++ (NSData *)firstResultWithProgram:(NSString *)program data:(NSData *)data error:(NSError**)__error
+{
+    NSError* error;
+    __block NSData* firstResult = nil;
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data callback:^(NSData* output, BOOL* __stop) {
+        firstResult = output;
+        *__stop = YES;
+    } error:&error];
+
+    // if error, set error and return nil
+    if (result != LMJqFilterSuccess) {
+        if (__error != NULL) {
+            *__error = error;
+        }
+        return nil;
+    }
+    
+    return firstResult;
 }
 
 #pragma mark - Errors

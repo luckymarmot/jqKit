@@ -25,6 +25,7 @@ FOUNDATION_EXPORT NSString* LMJqFilterErrorJQString;
 
 + (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data callback:(void(^)(NSData*, BOOL*))callback error:(NSError * _Nullable * _Nullable)__error;
 + (nullable NSArray<NSData*>*)filterWithProgram:(NSString*)program data:(NSData*)data error:(NSError * _Nullable * _Nullable)__error;
++ (nullable NSData*)firstResultWithProgram:(NSString*)program data:(NSData*)data error:(NSError * _Nullable * _Nullable)__error;
 
 @end
 
