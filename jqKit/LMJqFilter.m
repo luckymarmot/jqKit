@@ -21,7 +21,7 @@ enum {
     JQ_ERROR_UNKNOWN   =  5,
 };
 
-static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (^callback)(bool, const char* output, const char* error, const char* error_at)) {
+static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (^callback)(bool, const char* output, const char* error)) {
     int ret = JQ_OK_NO_OUTPUT;
     jv result;
 
@@ -40,7 +40,7 @@ static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (
         const char* output = jv_string_value(string_dump);
 
         // callback
-        callback(true, output, NULL, NULL);
+        callback(true, output, NULL);
     }
 
     // jq program invoked `halt` or `halt_error`
@@ -61,27 +61,25 @@ static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (
         // get error message
         jv error_message = jq_get_error_message(jq);
         if (jv_get_kind(error_message) == JV_KIND_STRING) {
-            callback(false, NULL, jv_string_value(error_message), NULL);
+            callback(false, NULL, jv_string_value(error_message));
         } else if (jv_get_kind(error_message) == JV_KIND_NULL) {
             // halt with no output
         } else if (jv_is_valid(error_message)) {
             error_message = jv_dump_string(jv_copy(error_message), 0);
-            callback(false, NULL, jv_string_value(error_message), NULL);
+            callback(false, NULL, jv_string_value(error_message));
         };
         jv_free(error_message);
     }
     // uncaught jq exception
     else if (jv_invalid_has_msg(jv_copy(result))) {
         jv msg = jv_invalid_get_msg(jv_copy(result));
-        jv input_pos = jq_util_input_get_position(jq);
         if (jv_get_kind(msg) == JV_KIND_STRING) {
-            callback(false, NULL, jv_string_value(msg), jv_string_value(input_pos));
+            callback(false, NULL, jv_string_value(msg));
         } else {
             msg = jv_dump_string(msg, 0);
-            callback(false, NULL, jv_string_value(msg), jv_string_value(input_pos));
+            callback(false, NULL, jv_string_value(msg));
         }
         ret = JQ_ERROR_UNKNOWN;
-        jv_free(input_pos);
         jv_free(msg);
     }
     jv_free(result);
@@ -94,7 +92,7 @@ static void lm_jq_err_cb(void *data, jv msg) {
     //    jv_free(msg);
 }
 
-LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^callback)(bool, const char* output, const char* error, const char* error_at))
+LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^callback)(bool, const char* output, const char* error))
 {
     // init jq
     jq_state* jq = jq_init();
@@ -123,7 +121,6 @@ LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^call
 NSString* LMJqFilterErrorDomain = @"com.luckymarmot.JqFilterErrorDomain";
 
 NSString* LMJqFilterErrorJQString = @"JQString";
-NSString* LMJqFilterErrorJQPos = @"JQPos";
 
 @implementation LMJqFilter
 
@@ -140,7 +137,7 @@ NSString* LMJqFilterErrorJQPos = @"JQPos";
 
     // run filter
     __block NSError* error = nil;
-    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, ^(bool status, const char *outputStr, const char *errorStr, const char *errorPosStr) {
+    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, ^(bool status, const char *outputStr, const char *errorStr) {
         if (status) {
             NSUInteger outputLen = strlen(outputStr);
             NSData* output = [NSData dataWithBytes:outputStr length:outputLen];
@@ -148,8 +145,7 @@ NSString* LMJqFilterErrorJQPos = @"JQPos";
         }
         else {
             NSString* errorJq = (errorStr != NULL ? [NSString stringWithCString:errorStr encoding:NSUTF8StringEncoding] : nil);
-            NSString* errorPos = (errorPosStr != NULL ? [NSString stringWithCString:errorPosStr encoding:NSUTF8StringEncoding] : nil);
-            error = [LMJqFilter jqFilterExecutionErrorWithString:errorJq jqErrorPos:errorPos];
+            error = [LMJqFilter jqFilterExecutionErrorWithString:errorJq];
         }
     });
 
@@ -189,12 +185,11 @@ NSString* LMJqFilterErrorJQPos = @"JQPos";
 
 #pragma mark - Errors
 
-+ (NSError*)jqFilterExecutionErrorWithString:(NSString*)jqErrorString jqErrorPos:(NSString*)jqErrorPos
++ (NSError*)jqFilterExecutionErrorWithString:(NSString*)jqErrorString
 {
     return [NSError errorWithDomain:LMJqFilterErrorDomain code:LMJqFilterExecutionError userInfo:@{
 		NSLocalizedDescriptionKey:[NSString stringWithFormat:@"jq: %@", (jqErrorString ?: @"")],
         LMJqFilterErrorJQString:(jqErrorString ?: @""),
-        LMJqFilterErrorJQPos:(jqErrorPos ?: @""),
 	}];
 }
 

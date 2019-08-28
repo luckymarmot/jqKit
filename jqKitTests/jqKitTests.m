@@ -16,6 +16,15 @@
 
 @implementation jqKitTests
 
+- (NSData*)_getTestFileContents:(NSString*)filePath
+{
+    NSURL* dirURL = [[NSBundle bundleForClass:[self class]].resourceURL URLByAppendingPathComponent:@"json" isDirectory:YES];
+    NSURL* fileURL = [dirURL URLByAppendingPathComponent:filePath isDirectory:NO];
+    return [NSData dataWithContentsOfURL:fileURL];
+}
+
+#pragma mark - Simple Tests
+
 - (void)testSimpleSelf
 {
     // {"foo": 0, "bar":1}
@@ -66,6 +75,63 @@
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
     XCTAssertEqual(error.code, LMJqFilterParsingError);
+}
+
+#pragma mark - Large Tests
+
+- (void)testSmallSelf
+{
+    NSData* data = [self _getTestFileContents:@"small.json"];
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqual(results.count, 1);
+    XCTAssertEqualObjects([NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL] options:kNilOptions error:NULL], [NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:results.firstObject options:kNilOptions error:NULL] options:kNilOptions error:NULL]);
+}
+
+- (void)testMediumSelf
+{
+    NSData* data = [self _getTestFileContents:@"medium.json"];
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqual(results.count, 1);
+    XCTAssertEqualObjects([NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL] options:NSJSONWritingSortedKeys error:NULL], [NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:results.firstObject options:kNilOptions error:NULL] options:NSJSONWritingSortedKeys error:NULL]);
+}
+
+- (void)test10MBSelf
+{
+    NSData* data = [self _getTestFileContents:@"10-MB.json"];
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqual(results.count, 1);
+    XCTAssertEqualObjects([NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL] options:NSJSONWritingSortedKeys error:NULL], [NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:results.firstObject options:kNilOptions error:NULL] options:NSJSONWritingSortedKeys error:NULL]);
+}
+
+- (void)testMediumFirst
+{
+    NSData* data = [self _getTestFileContents:@"medium.json"];
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[0]" data:data error:&error];
+    XCTAssertNotNil(results);
+    XCTAssertNil(error);
+    XCTAssertEqual(results.count, 1);
+    XCTAssertEqualObjects([NSJSONSerialization dataWithJSONObject:((NSArray*)[NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL]).firstObject options:NSJSONWritingSortedKeys error:NULL], [NSJSONSerialization dataWithJSONObject:[NSJSONSerialization JSONObjectWithData:results.firstObject options:kNilOptions error:NULL] options:NSJSONWritingSortedKeys error:NULL]);
+}
+
+- (void)testMediumError
+{
+    NSData* data = [self _getTestFileContents:@"medium.json"];
+    NSError* error = nil;
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"[4].key" data:data error:&error];
+    XCTAssertNil(results);
+    XCTAssertNotNil(error);
+    XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
+    XCTAssertEqual(error.code, LMJqFilterExecutionError);
 }
 
 @end

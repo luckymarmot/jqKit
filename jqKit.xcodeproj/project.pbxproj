@@ -14,6 +14,7 @@
 		AE2F00B62314480800DEA996 /* LMJqFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = AE2F00B42314480800DEA996 /* LMJqFilter.m */; };
 		AE2F00BE231448A600DEA996 /* libjq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BC231448A600DEA996 /* libjq.a */; };
 		AE2F00BF231448A600DEA996 /* libonig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2F00BD231448A600DEA996 /* libonig.a */; };
+		AE80D3DD2316C00A004C34A2 /* json in Resources */ = {isa = PBXBuildFile; fileRef = AE80D3DC2316C00A004C34A2 /* json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		AE2F00B42314480800DEA996 /* LMJqFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LMJqFilter.m; sourceTree = "<group>"; };
 		AE2F00BC231448A600DEA996 /* libjq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjq.a; path = Dependencies/jq_install/lib/libjq.a; sourceTree = SOURCE_ROOT; };
 		AE2F00BD231448A600DEA996 /* libonig.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonig.a; path = Dependencies/onig_install/lib/libonig.a; sourceTree = SOURCE_ROOT; };
+		AE80D3DC2316C00A004C34A2 /* json */ = {isa = PBXFileReference; lastKnownFileType = folder; name = json; path = Resources/json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 			children = (
 				AE2F00A7231441D000DEA996 /* jqKitTests.m */,
 				AE2F00A9231441D000DEA996 /* Info.plist */,
+				AE80D3DC2316C00A004C34A2 /* json */,
 			);
 			path = jqKitTests;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE80D3DD2316C00A004C34A2 /* json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,7 +20,6 @@ typedef enum : NSUInteger {
 FOUNDATION_EXPORT NSString* LMJqFilterErrorDomain;
 
 FOUNDATION_EXPORT NSString* LMJqFilterErrorJQString;
-FOUNDATION_EXPORT NSString* LMJqFilterErrorJQPos;
 
 @interface LMJqFilter : NSObject
 
