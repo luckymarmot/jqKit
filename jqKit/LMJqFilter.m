@@ -21,7 +21,8 @@ enum {
     JQ_ERROR_UNKNOWN   =  5,
 };
 
-static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (^callback)(bool, const char* output, const char* error, bool* __stop)) {
+static int lm_jq_process(jq_state *jq, jv value, int flags, LMJqFilterOptions options, int dumpopts, void (^callback)(bool, const char* output, const char* error, bool* __stop)) {
+    jv ret_value;
     int ret = JQ_OK_NO_OUTPUT;
     jv result;
     bool stop = false;
@@ -29,16 +30,20 @@ static int lm_jq_process(jq_state *jq, jv value, int flags, int dumpopts, void (
     // start and loop over results
     jq_start(jq, value, flags);
     while (jv_is_valid(result = jq_next(jq))) {
-        if (jv_get_kind(result) == JV_KIND_FALSE || jv_get_kind(result) == JV_KIND_NULL) {
-            ret = JQ_OK_NULL_KIND;
-        }
-        else {
+        // if string, use directly the string as return value `ret_value`
+        if (0 != (options & LMJqFilterOptionsRawOutput) &&
+            jv_get_kind(result) == JV_KIND_STRING) {
             ret = JQ_OK;
+            ret_value = result;
+        }
+        // if something else than a string, dump it as a string first
+        else {
+            ret = (jv_get_kind(result) == JV_KIND_FALSE || jv_get_kind(result) == JV_KIND_NULL) ? JQ_OK_NULL_KIND : JQ_OK;
+            ret_value = jv_dump_string(result, dumpopts);
         }
 
-        // get string
-        jv string_dump = jv_dump_string(result, dumpopts);
-        const char* output = jv_string_value(string_dump);
+        // get C string
+        const char* output = jv_string_value(ret_value);
 
         // callback
         callback(true, output, NULL, &stop);
@@ -101,7 +106,7 @@ static void lm_jq_err_cb(void *data, jv msg) {
     //    jv_free(msg);
 }
 
-LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^callback)(bool, const char* output, const char* error, bool* __stop))
+LMJqFilterResult lm_jq_filter(const char* program, const char* data, LMJqFilterOptions options, void (^callback)(bool, const char* output, const char* error, bool* __stop))
 {
     // init jq
     jq_state* jq = jq_init();
@@ -121,7 +126,7 @@ LMJqFilterResult lm_jq_filter(const char* program, const char* data, void (^call
     }
 
     // process
-    int ret = lm_jq_process(jq, v, 0 /* jq_flags */, JV_PRINT_INDENT_FLAGS(2) /* dumpopts */, callback);
+    int ret = lm_jq_process(jq, v, 0 /* jq_flags */, options, JV_PRINT_INDENT_FLAGS(2) /* dumpopts */, callback);
 
     jq_teardown(&jq);
     return ((ret == JQ_OK || ret == JQ_OK_NO_OUTPUT) ? LMJqFilterSuccess : LMJqFilterExecutionError);
@@ -133,7 +138,7 @@ NSString* LMJqFilterErrorJQString = @"JQString";
 
 @implementation LMJqFilter
 
-+ (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data callback:(void(^)(NSData*, BOOL* __stop))callback error:(NSError**)__error
++ (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data options:(LMJqFilterOptions)options callback:(void(^)(NSData*, BOOL* __stop))callback error:(NSError**)__error
 {
     // get program C string
     const char* programStr = [program cStringUsingEncoding:NSUTF8StringEncoding];
@@ -146,7 +151,7 @@ NSString* LMJqFilterErrorJQString = @"JQString";
 
     // run filter
     __block NSError* error = nil;
-    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, ^(bool status, const char *outputStr, const char *errorStr, bool* __stop) {
+    LMJqFilterResult result = lm_jq_filter(programStr, dataBuf, options, ^(bool status, const char *outputStr, const char *errorStr, bool* __stop) {
         if (status) {
             NSUInteger outputLen = strlen(outputStr);
             NSData* output = [NSData dataWithBytes:outputStr length:outputLen];
@@ -177,11 +182,11 @@ NSString* LMJqFilterErrorJQString = @"JQString";
     return result;
 }
 
-+ (NSArray<NSData*>*)filterWithProgram:(NSString*)program data:(NSData*)data error:(NSError**)__error
++ (NSArray<NSData*>*)filterWithProgram:(NSString*)program data:(NSData*)data options:(LMJqFilterOptions)options error:(NSError**)__error
 {
     NSError* error;
     NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
-    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data callback:^(NSData* output, BOOL* __stop) {
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data options:options callback:^(NSData* output, BOOL* __stop) {
         [resultArray addObject:output];
     } error:&error];
 
@@ -196,11 +201,11 @@ NSString* LMJqFilterErrorJQString = @"JQString";
     return [resultArray copy];
 }
 
-+ (NSData *)firstResultWithProgram:(NSString *)program data:(NSData *)data error:(NSError**)__error
++ (NSData *)firstResultWithProgram:(NSString *)program data:(NSData *)data options:(LMJqFilterOptions)options error:(NSError**)__error
 {
     NSError* error;
     __block NSData* firstResult = nil;
-    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data callback:^(NSData* output, BOOL* __stop) {
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:program data:data options:options callback:^(NSData* output, BOOL* __stop) {
         firstResult = output;
         *__stop = YES;
     } error:&error];

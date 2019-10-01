@@ -10,6 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_OPTIONS (NSUInteger, LMJqFilterOptions) {
+    LMJqFilterOptionsRawOutput = 1 << 1,
+};
+
 typedef enum : NSUInteger {
     LMJqFilterSuccess = 0,
     LMJqFilterCompileError = 1 /* compiling jq program/query */,
@@ -23,9 +27,9 @@ FOUNDATION_EXPORT NSString* LMJqFilterErrorJQString;
 
 @interface LMJqFilter : NSObject
 
-+ (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data callback:(void(^)(NSData*, BOOL*))callback error:(NSError * _Nullable * _Nullable)__error;
-+ (nullable NSArray<NSData*>*)filterWithProgram:(NSString*)program data:(NSData*)data error:(NSError * _Nullable * _Nullable)__error;
-+ (nullable NSData*)firstResultWithProgram:(NSString*)program data:(NSData*)data error:(NSError * _Nullable * _Nullable)__error;
++ (LMJqFilterResult)filterWithProgram:(NSString*)program data:(NSData*)data options:(LMJqFilterOptions)options callback:(void(^)(NSData*, BOOL*))callback error:(NSError * _Nullable * _Nullable)__error;
++ (nullable NSArray<NSData*>*)filterWithProgram:(NSString*)program data:(NSData*)data options:(LMJqFilterOptions)options error:(NSError * _Nullable * _Nullable)__error;
++ (nullable NSData*)firstResultWithProgram:(NSString*)program data:(NSData*)data options:(LMJqFilterOptions)options error:(NSError * _Nullable * _Nullable)__error;
 
 @end
 
