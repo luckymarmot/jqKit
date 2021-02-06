@@ -385,6 +385,7 @@
 					"$(PROJECT_DIR)/Dependencies/jq_install/lib",
 					"$(PROJECT_DIR)/Dependencies/onig_install/lib",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luckymarmot.jqKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
