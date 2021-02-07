@@ -29,7 +29,7 @@
 {
     // {"foo": 0, "bar":1}
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqualObjects(results, (@[[@"{\n  \"foo\": 0,\n  \"bar\": 42\n}" dataUsingEncoding:NSASCIIStringEncoding]]));
@@ -39,7 +39,7 @@
 {
     // {"foo": 0, "bar":1}
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".bar" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".bar" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqualObjects(results, (@[[@"42" dataUsingEncoding:NSASCIIStringEncoding]]));
@@ -49,7 +49,7 @@
 {
     // {"foo": 0, "bar":1}
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[]" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[]" data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqualObjects(results, (@[[@"0" dataUsingEncoding:NSASCIIStringEncoding], [@"42" dataUsingEncoding:NSASCIIStringEncoding]]));
@@ -59,7 +59,7 @@
 {
     // {"foo": 0, "bar":1}
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"(." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"(." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNil(results);
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
@@ -70,7 +70,7 @@
 {
     // {"foo": 0, "bar":1}
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, XXXXX}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:[@"{\"foo\": 0, XXXXX}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNil(results);
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
@@ -83,7 +83,7 @@
 {
     NSError* error = nil;
     NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
-    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] callback:^(NSData * output, BOOL * __stop) {
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions callback:^(NSData * output, BOOL * __stop) {
         [resultArray addObject:output];
     } error:&error];
     XCTAssertEqual(result, LMJqFilterSuccess);
@@ -96,7 +96,7 @@
 {
     NSError* error = nil;
     NSMutableArray<NSData*>* resultArray = [NSMutableArray array];
-    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] callback:^(NSData * output, BOOL * __stop) {
+    LMJqFilterResult result = [LMJqFilter filterWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions callback:^(NSData * output, BOOL * __stop) {
         [resultArray addObject:output];
         *__stop = YES;
     } error:&error];
@@ -111,7 +111,7 @@
 - (void)testFirstResultDict
 {
     NSError* error = nil;
-    NSData* firstResult = [LMJqFilter firstResultWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSData* firstResult = [LMJqFilter firstResultWithProgram:@"." data:[@"{\"foo\": 0, \"bar\":42}" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNotNil(firstResult);
     XCTAssertNil(error);
     XCTAssertEqualObjects(firstResult, ([@"{\n  \"foo\": 0,\n  \"bar\": 42\n}" dataUsingEncoding:NSASCIIStringEncoding]));
@@ -120,7 +120,7 @@
 - (void)testFirstResultArray
 {
     NSError* error = nil;
-    NSData* firstResult = [LMJqFilter firstResultWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    NSData* firstResult = [LMJqFilter firstResultWithProgram:@".[]" data:[@"[10, 20, 30, 40]" dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     XCTAssertNotNil(firstResult);
     XCTAssertNil(error);
     XCTAssertEqualObjects(firstResult, ([@"10" dataUsingEncoding:NSASCIIStringEncoding]));
@@ -132,7 +132,7 @@
 {
     NSData* data = [self _getTestFileContents:@"small.json"];
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqual(results.count, 1);
@@ -143,7 +143,7 @@
 {
     NSData* data = [self _getTestFileContents:@"medium.json"];
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqual(results.count, 1);
@@ -154,7 +154,7 @@
 {
     NSData* data = [self _getTestFileContents:@"10-MB.json"];
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"." data:data options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqual(results.count, 1);
@@ -165,7 +165,7 @@
 {
     NSData* data = [self _getTestFileContents:@"medium.json"];
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[0]" data:data error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@".[0]" data:data options:kNilOptions error:&error];
     XCTAssertNotNil(results);
     XCTAssertNil(error);
     XCTAssertEqual(results.count, 1);
@@ -176,7 +176,7 @@
 {
     NSData* data = [self _getTestFileContents:@"medium.json"];
     NSError* error = nil;
-    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"[4].key" data:data error:&error];
+    NSArray<NSData*>* results = [LMJqFilter filterWithProgram:@"[4].key" data:data options:kNilOptions error:&error];
     XCTAssertNil(results);
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, LMJqFilterErrorDomain);
